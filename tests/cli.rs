@@ -99,5 +99,8 @@ fn a_pipe_gets_no_ansi_and_no_hint() {
     assert!(out.status.success());
     let text = stdout_of(&out);
     assert!(!text.contains('\u{1b}'), "colour leaked into a pipe");
-    assert!(!text.contains("agentmonitor.haziapp.com"), "hint leaked into a pipe");
+    assert!(
+        !text.contains("agentmonitor.haziapp.com"),
+        "hint leaked into a pipe"
+    );
 }
