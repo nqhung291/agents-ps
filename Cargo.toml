@@ -1,6 +1,6 @@
 [package]
 name = "agents-ps"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 rust-version = "1.88"
 description = "See what Claude Code, Codex, Cursor and other AI agents are running on your Mac"

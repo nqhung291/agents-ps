@@ -8,14 +8,14 @@ per process. It also lists the processes those agents left behind after they exi
 and the ports they still hold. It reads the process table and prints; it never kills,
 signals, writes or changes anything.
 
-## Interactive view: `agents-ps top`
+## Interactive view: just run `agents-ps`
 
-`agents-ps top` shows the same snapshot as a full-screen, keyboard-driven explorer:
+Run `agents-ps` in a terminal and it opens a full-screen, keyboard-driven explorer:
 agent sessions as live process trees on the left, the selected process on the right,
 and Orphans and Ports views on `Tab`. It is read-only — there is no kill key; `y`
 copies `kill -TERM <pid>` to the clipboard and leaves running it to you.
 
-![agents-ps top: agent sessions as live process trees](docs/top.png)
+![agents-ps: agent sessions as live process trees](docs/top.png)
 
 ## Install
 
@@ -41,7 +41,7 @@ next to it, and put `agents-ps` on your `PATH`.
 
 Requires macOS. There is no Linux or Windows build.
 
-## `agents-ps top` keys
+## Interactive view keys
 
 | Key | Action |
 | --- | --- |
@@ -89,10 +89,13 @@ What the app adds on top of `agents-ps`:
 | Open a dev server from its port | — | ✓ one click |
 | Always on | — | ✓ menu-bar app, no command to run |
 
-## One-shot output
+## Plain-text output
+
+Piped, redirected or with `--json`, `agents-ps` prints a plain report instead of
+opening the interactive view. `agents-ps sessions` prints that report on a terminal too.
 
 ```
-$ agents-ps
+$ agents-ps sessions
 agents-ps  4 sessions · 34 processes · 14.5% CPU · 1.98 GiB · sampled in 341 ms
 
 omp  pid 34908 · ttys001 · up 1d 22h · 16 processes · 0.2% CPU · 772.6 MiB
@@ -149,13 +152,13 @@ agents-ps ports  5 listening ports owned by agent processes
 
 | Command | What it prints |
 | --- | --- |
-| `agents-ps` | one block per agent session: agent, pid, uptime, its process tree with pid, short command, CPU, RSS, listening ports, and per-session totals. Sorted by total RSS, largest first. |
+| `agents-ps` | in a terminal: the interactive view (session trees, orphans and ports with folding, sorting, filtering and a details pane; read-only). Piped, redirected or with `--json`: the same report as `agents-ps sessions`. |
+| `agents-ps sessions` | one block per agent session: agent, pid, uptime, its process tree with pid, short command, CPU, RSS, listening ports, and per-session totals. Sorted by total RSS, largest first. |
 | `agents-ps orphans` | processes left behind by agents that already exited: pid, command, age, RSS, ports, the agent that likely spawned it, the evidence, and a copy-pasteable `kill -TERM` line. |
 | `agents-ps ports` | listening TCP ports owned by agent trees or orphans, one row per port. |
-| `agents-ps top` (alias `tui`) | interactive full-screen view of the same data: session trees, orphans and ports with folding, sorting, filtering and a details pane. Read-only. Needs a terminal; `--json` is not supported. |
 
 Flags: `--json` for machine-readable output, `--no-hint` to drop the one line about
-Agents Monitor (`top` accepts `--no-hint` too, to hide its footer hint), `--version`,
+Agents Monitor (in the interactive view it hides the footer hint), `--version`,
 `--help`.
 
 `--json` is versioned and stable: `schema` is `1`, pids are integers, sizes are bytes,

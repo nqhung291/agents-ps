@@ -40,8 +40,10 @@ fn run() -> i32 {
         return 0;
     }
 
-    if args.command == Command::Top {
-        return run_top(&args);
+    // Bare `agents-ps` on a terminal is the interactive view; piped, redirected
+    // or `--json`, it stays the plain sessions report so scripts keep working.
+    if args.command == Command::Auto && !args.json && interactive_terminal() {
+        return run_tui(&args);
     }
 
     match collect(&args) {
@@ -58,11 +60,11 @@ fn run() -> i32 {
 
 /// The interactive view needs a real terminal on both ends: it reads keys from
 /// stdin and paints on stdout.
-fn run_top(args: &Args) -> i32 {
-    if !std::io::stdin().is_terminal() || !std::io::stdout().is_terminal() {
-        eprintln!("agents-ps: top needs an interactive terminal");
-        return 2;
-    }
+fn interactive_terminal() -> bool {
+    std::io::stdin().is_terminal() && std::io::stdout().is_terminal()
+}
+
+fn run_tui(args: &Args) -> i32 {
     let opts = tui::Options {
         no_hint: args.no_hint,
         color: std::env::var_os("NO_COLOR").is_none(),
@@ -88,7 +90,7 @@ fn collect(args: &Args) -> Result<String, String> {
     let generated_at_unix_ms = snapshot.now_us / 1000;
 
     let text = match args.command {
-        Command::Sessions => {
+        Command::Auto | Command::Sessions => {
             if args.json {
                 return Ok(report::sessions_json(
                     &snapshot.sessions,
@@ -124,7 +126,6 @@ fn collect(args: &Args) -> Result<String, String> {
             }
             report::ports_text(&snapshot.ports, style)
         }
-        Command::Top => unreachable!("top is dispatched before sampling"),
     };
 
     Ok(with_hint(text, args, style))

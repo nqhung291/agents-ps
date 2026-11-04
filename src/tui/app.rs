@@ -1,4 +1,4 @@
-//! State, key handling, and the pure row logic behind `agents-ps top`.
+//! State, key handling, and the pure row logic behind the interactive view.
 //!
 //! Everything in this module is read-only. The only side effects are sending
 //! commands to the sampler thread and writing the copy line to `pbcopy`.

@@ -8,7 +8,7 @@ Set Padding 20
 Set WindowBar Colorful
 Set Theme "Catppuccin Mocha"
 Hide
-Type "agents-ps top"
+Type "agents-ps"
 Enter
 Sleep 14s
 Show

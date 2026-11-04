@@ -10,10 +10,11 @@ USAGE:
     agents-ps [COMMAND] [OPTIONS]
 
 COMMANDS:
-    (none)     live agent sessions, their process trees and listening ports
+    (none)     interactive full-screen view in a terminal (sessions, orphans,
+               ports); prints the sessions report when piped or with --json
+    sessions   live agent sessions, their process trees and listening ports
     orphans    processes left behind by agents that already exited
     ports      listening ports owned by agent trees or orphans
-    top        interactive full-screen view (sessions, orphans, ports); read-only
 
 OPTIONS:
     --json       machine-readable output (stable schema, no hint line)
@@ -27,11 +28,12 @@ Exit code 0 on success, 2 on a usage error.
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum Command {
+    /// No command given: the interactive view on a terminal, else `Sessions`.
     #[default]
+    Auto,
     Sessions,
     Orphans,
     Ports,
-    Top,
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -78,11 +80,10 @@ where
                 out.command = match value.to_string_lossy().as_ref() {
                     "orphans" => Command::Orphans,
                     "ports" => Command::Ports,
-                    "top" | "tui" => Command::Top,
                     "sessions" | "status" => Command::Sessions,
                     other => {
                         return Err(UsageError(format!(
-                            "unknown command: {other} (expected orphans, ports or top)"
+                            "unknown command: {other} (expected sessions, orphans or ports)"
                         )));
                     }
                 };
@@ -92,9 +93,6 @@ where
             }
         }
     }
-    if out.json && out.command == Command::Top {
-        return Err(UsageError("--json is not supported by top".to_string()));
-    }
     Ok(out)
 }
 
@@ -103,10 +101,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn default_is_sessions() {
+    fn default_is_auto() {
         let args = parse::<[&str; 0]>([]).unwrap();
-        assert_eq!(args.command, Command::Sessions);
+        assert_eq!(args.command, Command::Auto);
         assert!(!args.json && !args.no_hint && !args.help);
+        assert_eq!(
+            parse(["agents-ps", "sessions"]).unwrap().command,
+            Command::Sessions
+        );
     }
 
     #[test]
@@ -126,17 +128,6 @@ mod tests {
         assert!(parse(["agents-ps", "-h"]).unwrap().help);
         assert!(parse(["agents-ps", "--version"]).unwrap().version);
         assert!(parse(["agents-ps", "-V"]).unwrap().version);
-    }
-
-    #[test]
-    fn top_is_an_interactive_command() {
-        assert_eq!(parse(["agents-ps", "top"]).unwrap().command, Command::Top);
-        assert_eq!(parse(["agents-ps", "tui"]).unwrap().command, Command::Top);
-
-        let err = parse(["agents-ps", "top", "--json"]).unwrap_err();
-        assert_eq!(err.0, "--json is not supported by top");
-        let err = parse(["agents-ps", "--json", "tui"]).unwrap_err();
-        assert_eq!(err.0, "--json is not supported by top");
     }
 
     #[test]

@@ -1,4 +1,4 @@
-//! Interactive full-screen view (`agents-ps top`).
+//! Interactive full-screen view (bare `agents-ps` on a terminal).
 //!
 //! Read-only by construction: this module only reads process data and shows or
 //! copies `kill -TERM <pid>` lines. Nothing here sends a signal.

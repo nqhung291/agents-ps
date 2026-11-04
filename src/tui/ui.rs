@@ -1,4 +1,4 @@
-//! Rendering for `agents-ps top`: one header, three tabs, three tables, a
+//! Rendering for the interactive view: one header, three tabs, three tables, a
 //! detail pane, the footer and the help popup.
 //!
 //! Colours come from the 16 ANSI names; a background is never set, and the

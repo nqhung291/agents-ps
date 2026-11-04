@@ -30,9 +30,10 @@ fn help_lists_every_command() {
     assert!(out.status.success());
     let text = stdout_of(&out);
     for needle in [
+        "sessions",
         "orphans",
         "ports",
-        "top",
+        "interactive",
         "--json",
         "--no-hint",
         "never kills",
@@ -42,15 +43,16 @@ fn help_lists_every_command() {
 }
 
 #[test]
-fn top_without_a_terminal_exits_2() {
-    // The harness pipes stdout, so `top` must refuse rather than paint escape codes.
-    let out = run(&["top"]);
-    assert_eq!(out.status.code(), Some(2));
-    let stderr = String::from_utf8(out.stderr).expect("utf-8 stderr");
+fn bare_command_on_a_pipe_prints_the_plain_report() {
+    // The harness pipes stdout: no full-screen view, no escape codes, exit 0.
+    let out = run(&[]);
+    assert!(out.status.success());
+    let text = stdout_of(&out);
     assert!(
-        stderr.contains("top needs an interactive terminal"),
-        "unexpected stderr: {stderr:?}"
+        text.starts_with("agents-ps  "),
+        "unexpected stdout: {text:?}"
     );
+    assert!(!text.contains('\x1b'), "escape codes on a pipe: {text:?}");
 }
 
 #[test]
