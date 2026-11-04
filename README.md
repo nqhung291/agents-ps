@@ -70,6 +70,10 @@ Homebrew:
 brew install nqhung291/tap/agents-ps
 ```
 
+On arm64 macOS 26 the formula pours a prebuilt bottle; everywhere else Homebrew
+unpacks the release tarball. If Homebrew asks you to trust the tap first, run
+`brew trust --formula nqhung291/tap/agents-ps`.
+
 From source, with Rust 1.88 or newer:
 
 ```
