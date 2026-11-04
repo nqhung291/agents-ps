@@ -4,12 +4,27 @@
 
 <h2>🖥️ Want a real app? <strong>Agents Monitor</strong> has a far better UI</h2>
 
-A native macOS menu-bar app: live per-tree CPU and memory, threshold alerts,
-notifications, history across sessions, and one-click cleanup with safe tree kill.
+A native macOS app that watches your agents continuously, so you never have to run a command.
 
-**[agentmonitor.haziapp.com →](https://agentmonitor.haziapp.com/?utm_source=agents-ps&utm_medium=readme&utm_campaign=banner)**
+<a href="https://agentmonitor.haziapp.com/?utm_source=agents-ps&utm_medium=readme&utm_campaign=banner"><img src="docs/agents-monitor.png" alt="Agents Monitor: live CPU and RAM charts per agent, alerts, orphaned processes, auto-kill and per-process controls" width="900"></a>
+
+**[Get Agents Monitor → agentmonitor.haziapp.com](https://agentmonitor.haziapp.com/?utm_source=agents-ps&utm_medium=readme&utm_campaign=banner)**
 
 </div>
+
+What the app adds on top of `agents-ps`:
+
+| | `agents-ps` (free CLI) | **Agents Monitor** (app) |
+| --- | --- | --- |
+| Agent sessions, process trees, ports | ✓ | ✓ |
+| Orphans left behind by exited agents | ✓ one snapshot | ✓ remembered across sessions, plus unconfirmed suspects |
+| Live CPU / RAM charts with warn and limit lines | — | ✓ 1m / 5m / 15m history per agent and per process |
+| Threshold alerts and notifications | — | ✓ e.g. "Ollama tree CPU 468% > 400% for 10s", with an alert log per agent |
+| Kill a process or a whole tree | — (prints `kill` for you) | ✓ one click, safe tree kill |
+| Clean up orphans | — | ✓ one-click cleanup, or auto-kill with a countdown you can cancel or pause |
+| Working-directory growth | — | ✓ watches dirs like `node_modules` (e.g. +18 MiB/min) |
+| Open a dev server from its port | — | ✓ one click |
+| Always on | — | ✓ menu-bar app, no command to run |
 
 `agents-ps` answers one question about a Mac: what are my AI coding agents actually
 running? It finds the process of every Claude Code, Codex CLI, Cursor Agent, Aider,
