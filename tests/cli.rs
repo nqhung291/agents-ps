@@ -29,9 +29,28 @@ fn help_lists_every_command() {
     let out = run(&["--help"]);
     assert!(out.status.success());
     let text = stdout_of(&out);
-    for needle in ["orphans", "ports", "--json", "--no-hint", "never kills"] {
+    for needle in [
+        "orphans",
+        "ports",
+        "top",
+        "--json",
+        "--no-hint",
+        "never kills",
+    ] {
         assert!(text.contains(needle), "help is missing {needle:?}");
     }
+}
+
+#[test]
+fn top_without_a_terminal_exits_2() {
+    // The harness pipes stdout, so `top` must refuse rather than paint escape codes.
+    let out = run(&["top"]);
+    assert_eq!(out.status.code(), Some(2));
+    let stderr = String::from_utf8(out.stderr).expect("utf-8 stderr");
+    assert!(
+        stderr.contains("top needs an interactive terminal"),
+        "unexpected stderr: {stderr:?}"
+    );
 }
 
 #[test]

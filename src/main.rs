@@ -7,17 +7,15 @@ mod model;
 mod orphans;
 mod report;
 mod rules;
+mod snapshot;
 mod source;
 mod tree;
+mod tui;
 
-use std::collections::{HashMap, HashSet};
 use std::io::{IsTerminal, Write};
-use std::path::PathBuf;
 
 use cli::{Args, Command};
 use human::Style;
-use model::{ProcInfo, ProcKey};
-use report::{OrphanView, PortRow, SessionView, Totals};
 
 fn main() {
     let code = run();
@@ -42,6 +40,10 @@ fn run() -> i32 {
         return 0;
     }
 
+    if args.command == Command::Top {
+        return run_top(&args);
+    }
+
     match collect(&args) {
         Ok(text) => {
             emit(&text);
@@ -54,145 +56,75 @@ fn run() -> i32 {
     }
 }
 
+/// The interactive view needs a real terminal on both ends: it reads keys from
+/// stdin and paints on stdout.
+fn run_top(args: &Args) -> i32 {
+    if !std::io::stdin().is_terminal() || !std::io::stdout().is_terminal() {
+        eprintln!("agents-ps: top needs an interactive terminal");
+        return 2;
+    }
+    let opts = tui::Options {
+        no_hint: args.no_hint,
+        color: std::env::var_os("NO_COLOR").is_none(),
+    };
+    match tui::run(opts) {
+        Ok(()) => 0,
+        Err(err) => {
+            eprintln!("agents-ps: {err}");
+            1
+        }
+    }
+}
+
 /// Sample once, attribute processes, then render the requested command.
 fn collect(args: &Args) -> Result<String, String> {
     let rules = rules::builtin_rules();
     let mut sampler = source::Sampler::new(&rules);
-    let sample = sampler.sample();
-    let mut procs = sample.procs;
-
-    let trees = tree::build_live_trees(&procs, &rules);
-    let member_keys: HashSet<ProcKey> = trees
-        .iter()
-        .flat_map(|t| t.members.iter().copied())
-        .collect();
-
-    // SAFETY: getuid takes no arguments, cannot fail, and has no side effects.
-    let own_uid = unsafe { libc::getuid() };
-    let live_pids: HashSet<i32> = procs.iter().map(|p| p.key.pid).collect();
-
-    // Probe ports for tree members and for launchd-adopted candidates only: one
-    // extra syscall per pid instead of one per process on the machine.
-    let mut probe: HashSet<i32> = member_keys.iter().map(|k| k.pid).collect();
-    for p in &procs {
-        let parent_gone = p.ppid == 1 || !live_pids.contains(&p.ppid);
-        if parent_gone && p.uid == Some(own_uid) && !member_keys.contains(&p.key) {
-            probe.insert(p.key.pid);
-        }
-    }
-    source::fill_ports(&mut procs, &probe);
-
-    let mut trees = trees;
-    for tree in &mut trees {
-        tree::recompute_aggregates(tree, &procs);
-    }
-
-    let home = std::env::var_os("HOME").map(PathBuf::from);
-    let candidates = orphans::classify(&procs, &rules, &trees, own_uid, home.as_deref());
-
-    let mut by_key: HashMap<ProcKey, &ProcInfo> = HashMap::new();
-    let mut by_pid: HashMap<i32, &ProcInfo> = HashMap::new();
-    for p in &procs {
-        by_key.insert(p.key, p);
-        by_pid.insert(p.key.pid, p);
-    }
+    let snapshot = snapshot::Snapshot::collect(&mut sampler, &rules);
 
     let style = Style {
         color: color_enabled(),
     };
-    let now_us = sample.now_us;
-    let generated_at_unix_ms = now_us / 1000;
+    let generated_at_unix_ms = snapshot.now_us / 1000;
 
     let text = match args.command {
         Command::Sessions => {
-            let mut sessions: Vec<SessionView> = trees
-                .iter()
-                .map(|t| SessionView::build(t, &by_key, now_us))
-                .collect();
-            sessions.sort_by(|a, b| {
-                b.rss_bytes
-                    .cmp(&a.rss_bytes)
-                    .then_with(|| a.pid.cmp(&b.pid))
-            });
-            let totals = Totals::of(&sessions);
             if args.json {
                 return Ok(report::sessions_json(
-                    &sessions,
-                    totals,
-                    sample.sample_ms,
+                    &snapshot.sessions,
+                    snapshot.totals,
+                    snapshot.sample_ms,
                     generated_at_unix_ms,
                 ));
             }
-            report::sessions_text(&sessions, totals, sample.sample_ms, style)
+            report::sessions_text(
+                &snapshot.sessions,
+                snapshot.totals,
+                snapshot.sample_ms,
+                style,
+            )
         }
         Command::Orphans => {
-            let mut views: Vec<OrphanView> = candidates
-                .iter()
-                .filter_map(|c| OrphanView::build(c, &by_key, now_us))
-                .collect();
-            views.sort_by(|a, b| {
-                b.rss_bytes
-                    .cmp(&a.rss_bytes)
-                    .then_with(|| a.pid.cmp(&b.pid))
-            });
             if args.json {
                 return Ok(report::orphans_json(
-                    &views,
-                    sample.sample_ms,
+                    &snapshot.orphans,
+                    snapshot.sample_ms,
                     generated_at_unix_ms,
                 ));
             }
-            report::orphans_text(&views, style)
+            report::orphans_text(&snapshot.orphans, style)
         }
         Command::Ports => {
-            let mut rows: Vec<PortRow> = Vec::new();
-            for tree in &trees {
-                for key in &tree.members {
-                    let Some(p) = by_key.get(key) else { continue };
-                    for port in &p.ports {
-                        rows.push(PortRow {
-                            port: *port,
-                            pid: p.key.pid,
-                            cmd: p.short_cmd(),
-                            agent_id: Some(tree.agent_id.clone()),
-                            agent_name: Some(tree.agent_name.clone()),
-                            kind: "session".to_string(),
-                            session_pid: Some(tree.root.pid),
-                        });
-                    }
-                }
-            }
-            for candidate in &candidates {
-                let Some(p) = by_key.get(&candidate.key) else {
-                    continue;
-                };
-                for port in &p.ports {
-                    rows.push(PortRow {
-                        port: *port,
-                        pid: p.key.pid,
-                        cmd: p.short_cmd(),
-                        agent_id: candidate.agent_id.clone(),
-                        agent_name: candidate.agent_name.clone(),
-                        kind: "orphan".to_string(),
-                        session_pid: None,
-                    });
-                }
-            }
-            rows.sort_by(|a, b| {
-                (a.kind != "session")
-                    .cmp(&(b.kind != "session"))
-                    .then_with(|| a.port.cmp(&b.port))
-                    .then_with(|| a.pid.cmp(&b.pid))
-            });
             if args.json {
                 return Ok(report::ports_json(
-                    &rows,
-                    sample.sample_ms,
+                    &snapshot.ports,
+                    snapshot.sample_ms,
                     generated_at_unix_ms,
                 ));
             }
-            report::ports_text(&rows, style)
+            report::ports_text(&snapshot.ports, style)
         }
+        Command::Top => unreachable!("top is dispatched before sampling"),
     };
 
     Ok(with_hint(text, args, style))

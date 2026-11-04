@@ -13,6 +13,7 @@ COMMANDS:
     (none)     live agent sessions, their process trees and listening ports
     orphans    processes left behind by agents that already exited
     ports      listening ports owned by agent trees or orphans
+    top        interactive full-screen view (sessions, orphans, ports); read-only
 
 OPTIONS:
     --json       machine-readable output (stable schema, no hint line)
@@ -30,6 +31,7 @@ pub enum Command {
     Sessions,
     Orphans,
     Ports,
+    Top,
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -76,10 +78,11 @@ where
                 out.command = match value.to_string_lossy().as_ref() {
                     "orphans" => Command::Orphans,
                     "ports" => Command::Ports,
+                    "top" | "tui" => Command::Top,
                     "sessions" | "status" => Command::Sessions,
                     other => {
                         return Err(UsageError(format!(
-                            "unknown command: {other} (expected orphans or ports)"
+                            "unknown command: {other} (expected orphans, ports or top)"
                         )));
                     }
                 };
@@ -88,6 +91,9 @@ where
                 return Err(UsageError(other.unexpected().to_string()));
             }
         }
+    }
+    if out.json && out.command == Command::Top {
+        return Err(UsageError("--json is not supported by top".to_string()));
     }
     Ok(out)
 }
@@ -120,6 +126,17 @@ mod tests {
         assert!(parse(["agents-ps", "-h"]).unwrap().help);
         assert!(parse(["agents-ps", "--version"]).unwrap().version);
         assert!(parse(["agents-ps", "-V"]).unwrap().version);
+    }
+
+    #[test]
+    fn top_is_an_interactive_command() {
+        assert_eq!(parse(["agents-ps", "top"]).unwrap().command, Command::Top);
+        assert_eq!(parse(["agents-ps", "tui"]).unwrap().command, Command::Top);
+
+        let err = parse(["agents-ps", "top", "--json"]).unwrap_err();
+        assert_eq!(err.0, "--json is not supported by top");
+        let err = parse(["agents-ps", "--json", "tui"]).unwrap_err();
+        assert_eq!(err.0, "--json is not supported by top");
     }
 
     #[test]

@@ -1,5 +1,16 @@
 # agents-ps
 
+<div align="center">
+
+<h2>🖥️ Want a real app? <strong>Agents Monitor</strong> has a far better UI</h2>
+
+A native macOS menu-bar app: live per-tree CPU and memory, threshold alerts,
+notifications, history across sessions, and one-click cleanup with safe tree kill.
+
+**[agentmonitor.haziapp.com →](https://agentmonitor.haziapp.com/?utm_source=agents-ps&utm_medium=readme&utm_campaign=banner)**
+
+</div>
+
 `agents-ps` answers one question about a Mac: what are my AI coding agents actually
 running? It finds the process of every Claude Code, Codex CLI, Cursor Agent, Aider,
 Gemini CLI, opencode, Goose, Amp, omp and Ollama session, groups everything that
@@ -7,6 +18,35 @@ session spawned into a single tree, and reports CPU, memory and listening TCP po
 per process. It also lists the processes those agents left behind after they exited,
 and the ports they still hold. It reads the process table and prints; it never kills,
 signals, writes or changes anything.
+
+## Interactive view: `agents-ps top`
+
+`agents-ps top` shows the same snapshot as a full-screen, keyboard-driven explorer:
+agent sessions as live process trees on the left, the selected process on the right,
+and Orphans and Ports views on `Tab`. It is read-only — there is no kill key; `y`
+copies `kill -TERM <pid>` to the clipboard and leaves running it to you.
+
+![agents-ps top: agent sessions as live process trees](docs/top.png)
+
+| Key | Action |
+| --- | --- |
+| `q`, `Ctrl-C` | quit |
+| `Esc` | close help, clear filter |
+| `Tab`, `Shift-Tab`, `1` `2` `3` | switch Sessions / Orphans / Ports |
+| `j` `k`, `↑` `↓`, `g` `G`, `PgUp` `PgDn` | move |
+| `Space`, `←` `h`, `→` `l`, `E` | fold, collapse, expand, toggle all |
+| `/` | filter |
+| `s` `S` | sort column: CPU, RSS, PID, AGE |
+| `r` | reverse sort |
+| `Enter` | details pane |
+| `y` | copy `kill -TERM <pid>` to the clipboard (via `pbcopy`) |
+| `R` | refresh now |
+| `p` | pause |
+| `+` `-` | refresh interval, 1–10 s (default 2 s) |
+| `?` | help |
+
+The screenshot is produced by [vhs](https://github.com/charmbracelet/vhs): run
+`vhs docs/top.tape` from the repo root with `agents-ps` on your `PATH`.
 
 ```
 $ agents-ps
@@ -93,9 +133,11 @@ Requires macOS. There is no Linux or Windows build.
 | `agents-ps` | one block per agent session: agent, pid, uptime, its process tree with pid, short command, CPU, RSS, listening ports, and per-session totals. Sorted by total RSS, largest first. |
 | `agents-ps orphans` | processes left behind by agents that already exited: pid, command, age, RSS, ports, the agent that likely spawned it, the evidence, and a copy-pasteable `kill -TERM` line. |
 | `agents-ps ports` | listening TCP ports owned by agent trees or orphans, one row per port. |
+| `agents-ps top` (alias `tui`) | interactive full-screen view of the same data: session trees, orphans and ports with folding, sorting, filtering and a details pane. Read-only. Needs a terminal; `--json` is not supported. |
 
 Flags: `--json` for machine-readable output, `--no-hint` to drop the one line about
-Agents Monitor, `--version`, `--help`.
+Agents Monitor (`top` accepts `--no-hint` too, to hide its footer hint), `--version`,
+`--help`.
 
 `--json` is versioned and stable: `schema` is `1`, pids are integers, sizes are bytes,
 CPU percentages are floats (`cpu_pct`), and every list is deterministically ordered.
@@ -163,11 +205,10 @@ them.
 
 ## Want live monitoring?
 
-`agents-ps` is the free, open-source part of [Agents Monitor](https://agentmonitor.haziapp.com/?utm_source=agents-ps),
-a native macOS menu-bar app that watches agent trees continuously: live per-tree CPU,
-memory and disk growth, threshold alerts, notifications, history across sessions, and
-one-click cleanup of what an agent left running. The CLI is complete on its own; the
-app is for when you want to know without typing a command.
+[Agents Monitor](https://agentmonitor.haziapp.com/?utm_source=agents-ps) is the
+native macOS app built on the same detection: continuous sampling, threshold alerts
+and notifications, history across sessions, and one-click cleanup of what an agent
+left running. `agents-ps` stays complete on its own and never needs it.
 
 ## License
 

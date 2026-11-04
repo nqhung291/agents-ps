@@ -37,8 +37,10 @@ pub fn bsd_info(pid: i32) -> Option<BsdInfo> {
 /// Device name for a tty device number, e.g. `ttys001`.
 pub fn tty_name(dev: u32) -> String {
     // SAFETY: `devname` only reads its arguments and returns either NULL or a
-    // pointer to a static NUL-terminated buffer owned by libc. The process is
-    // single-threaded, so nothing can overwrite that buffer while it is copied.
+    // pointer to a static NUL-terminated buffer owned by libc. Every caller of
+    // this module samples from one thread at a time (the one-shot CLI or the
+    // TUI's single sampler thread), so nothing can overwrite that buffer while
+    // it is copied.
     let ptr = unsafe { libc::devname(dev as libc::dev_t, libc::S_IFCHR) };
     if ptr.is_null() {
         return format!("dev:{dev:#x}");
