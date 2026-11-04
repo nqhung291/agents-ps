@@ -1,0 +1,26 @@
+[package]
+name = "agents-ps"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+description = "See what Claude Code, Codex, Cursor and other AI agents are running on your Mac"
+license = "MIT"
+repository = "https://github.com/nqhung291/agents-ps"
+homepage = "https://agentmonitor.haziapp.com"
+readme = "README.md"
+keywords = ["ai", "agents", "process", "macos", "cli"]
+categories = ["command-line-utilities"]
+
+[dependencies]
+libc = "0.2"
+libproc = "0.14"
+lexopt = "0.3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sysinfo = "0.38"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
