@@ -17,6 +17,32 @@ copies `kill -TERM <pid>` to the clipboard and leaves running it to you.
 
 ![agents-ps top: agent sessions as live process trees](docs/top.png)
 
+## Install
+
+Homebrew:
+
+```
+brew install nqhung291/tap/agents-ps
+```
+
+On arm64 macOS 26 the formula pours a prebuilt bottle; everywhere else Homebrew
+unpacks the release tarball. If Homebrew asks you to trust the tap first, run
+`brew trust --formula nqhung291/tap/agents-ps`.
+
+From source, with Rust 1.88 or newer:
+
+```
+cargo install --git https://github.com/nqhung291/agents-ps
+```
+
+Or download the release tarball for your Mac from
+[Releases](https://github.com/nqhung291/agents-ps/releases), verify the `.sha256`
+next to it, and put `agents-ps` on your `PATH`.
+
+Requires macOS. There is no Linux or Windows build.
+
+## `agents-ps top` keys
+
 | Key | Action |
 | --- | --- |
 | `q`, `Ctrl-C` | quit |
@@ -118,30 +144,6 @@ agents-ps ports  5 listening ports owned by agent processes
   53527  38070  omp orca-agent-status.ts      omp (session pid 38070)
   59466  57486  Google Chrome for Testing a…  omp (session pid 34908)
 ```
-
-## Install
-
-Homebrew:
-
-```
-brew install nqhung291/tap/agents-ps
-```
-
-On arm64 macOS 26 the formula pours a prebuilt bottle; everywhere else Homebrew
-unpacks the release tarball. If Homebrew asks you to trust the tap first, run
-`brew trust --formula nqhung291/tap/agents-ps`.
-
-From source, with Rust 1.88 or newer:
-
-```
-cargo install --git https://github.com/nqhung291/agents-ps
-```
-
-Or download the release tarball for your Mac from
-[Releases](https://github.com/nqhung291/agents-ps/releases), verify the `.sha256`
-next to it, and put `agents-ps` on your `PATH`.
-
-Requires macOS. There is no Linux or Windows build.
 
 ## Commands
 
