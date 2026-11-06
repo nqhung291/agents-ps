@@ -1,5 +1,5 @@
 Output target/vhs/top.gif
-Require agents-ps
+Require agtop
 Set Shell zsh
 Set FontSize 15
 Set Width 1600
@@ -8,7 +8,7 @@ Set Padding 20
 Set WindowBar Colorful
 Set Theme "Catppuccin Mocha"
 Hide
-Type "agents-ps"
+Type "agtop"
 Enter
 Sleep 14s
 Show

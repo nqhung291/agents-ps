@@ -3,8 +3,8 @@
 version = 4
 
 [[package]]
-name = "agents-ps"
-version = "0.2.0"
+name = "agtop"
+version = "0.3.0"
 dependencies = [
  "lexopt",
  "libc",

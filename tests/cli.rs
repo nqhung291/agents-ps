@@ -4,10 +4,10 @@
 use std::process::{Command, Output};
 
 fn run(args: &[&str]) -> Output {
-    Command::new(env!("CARGO_BIN_EXE_agents-ps"))
+    Command::new(env!("CARGO_BIN_EXE_agtop"))
         .args(args)
         .output()
-        .expect("spawn agents-ps")
+        .expect("spawn agtop")
 }
 
 fn stdout_of(output: &Output) -> String {
@@ -20,7 +20,7 @@ fn version_comes_from_the_manifest() {
     assert!(out.status.success());
     assert_eq!(
         stdout_of(&out).trim(),
-        format!("agents-ps {}", env!("CARGO_PKG_VERSION"))
+        format!("agtop {}", env!("CARGO_PKG_VERSION"))
     );
 }
 
@@ -49,7 +49,7 @@ fn bare_command_on_a_pipe_prints_the_plain_report() {
     assert!(out.status.success());
     let text = stdout_of(&out);
     assert!(
-        text.starts_with("agents-ps  "),
+        text.starts_with("agtop  "),
         "unexpected stdout: {text:?}"
     );
     assert!(!text.contains('\x1b'), "escape codes on a pipe: {text:?}");

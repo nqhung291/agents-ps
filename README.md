@@ -1,6 +1,8 @@
-# agents-ps
+# agtop
 
-`agents-ps` answers one question about a Mac: what are my AI coding agents actually
+`top` for AI agents. Formerly `agents-ps`.
+
+`agtop` answers one question about a Mac: what are my AI coding agents actually
 running? It finds the process of every Claude Code, Codex CLI, Cursor Agent, Aider,
 Gemini CLI, opencode, Goose, Amp, omp and Ollama session, groups everything that
 session spawned into a single tree, and reports CPU, memory and listening TCP ports
@@ -8,36 +10,39 @@ per process. It also lists the processes those agents left behind after they exi
 and the ports they still hold. It reads the process table and prints; it never kills,
 signals, writes or changes anything.
 
-## Interactive view: just run `agents-ps`
+## Interactive view: just run `agtop`
 
-Run `agents-ps` in a terminal and it opens a full-screen, keyboard-driven explorer:
+Run `agtop` in a terminal and it opens a full-screen, keyboard-driven explorer:
 agent sessions as live process trees on the left, the selected process on the right,
 and Orphans and Ports views on `Tab`. It is read-only — there is no kill key; `y`
 copies `kill -TERM <pid>` to the clipboard and leaves running it to you.
 
-![agents-ps: agent sessions as live process trees](docs/top.png)
+![agtop: agent sessions as live process trees](docs/top.png)
 
 ## Install
 
 Homebrew:
 
 ```
-brew install nqhung291/tap/agents-ps
+brew install nqhung291/tap/agtop
 ```
 
 On arm64 macOS 26 the formula pours a prebuilt bottle; everywhere else Homebrew
 unpacks the release tarball. If Homebrew asks you to trust the tap first, run
-`brew trust --formula nqhung291/tap/agents-ps`.
+`brew trust --formula nqhung291/tap/agtop`.
+
+Already installed `agents-ps` from the tap? `brew update && brew upgrade` migrates it
+to `agtop`; the command is now `agtop`.
 
 From source, with Rust 1.88 or newer:
 
 ```
-cargo install --git https://github.com/nqhung291/agents-ps
+cargo install --git https://github.com/nqhung291/agtop
 ```
 
 Or download the release tarball for your Mac from
-[Releases](https://github.com/nqhung291/agents-ps/releases), verify the `.sha256`
-next to it, and put `agents-ps` on your `PATH`.
+[Releases](https://github.com/nqhung291/agtop/releases), verify the `.sha256`
+next to it, and put `agtop` on your `PATH`.
 
 Requires macOS. There is no Linux or Windows build.
 
@@ -61,7 +66,7 @@ Requires macOS. There is no Linux or Windows build.
 | `?` | help |
 
 The screenshot is produced by [vhs](https://github.com/charmbracelet/vhs): run
-`vhs docs/top.tape` from the repo root with `agents-ps` on your `PATH`.
+`vhs docs/top.tape` from the repo root with `agtop` on your `PATH`.
 
 <div align="center">
 
@@ -69,15 +74,15 @@ The screenshot is produced by [vhs](https://github.com/charmbracelet/vhs): run
 
 A native macOS app that watches your agents continuously, so you never have to run a command.
 
-<a href="https://agentmonitor.haziapp.com/?utm_source=agents-ps&utm_medium=readme&utm_campaign=banner"><img src="docs/agents-monitor.png" alt="Agents Monitor: live CPU and RAM charts per agent, alerts, orphaned processes, auto-kill and per-process controls" width="900"></a>
+<a href="https://agentmonitor.haziapp.com/?utm_source=agtop&utm_medium=readme&utm_campaign=banner"><img src="docs/agents-monitor.png" alt="Agents Monitor: live CPU and RAM charts per agent, alerts, orphaned processes, auto-kill and per-process controls" width="900"></a>
 
-**[Get Agents Monitor → agentmonitor.haziapp.com](https://agentmonitor.haziapp.com/?utm_source=agents-ps&utm_medium=readme&utm_campaign=banner)**
+**[Get Agents Monitor → agentmonitor.haziapp.com](https://agentmonitor.haziapp.com/?utm_source=agtop&utm_medium=readme&utm_campaign=banner)**
 
 </div>
 
-What the app adds on top of `agents-ps`:
+What the app adds on top of `agtop`:
 
-| | `agents-ps` (free CLI) | **Agents Monitor** (app) |
+| | `agtop` (free CLI) | **Agents Monitor** (app) |
 | --- | --- | --- |
 | Agent sessions, process trees, ports | ✓ | ✓ |
 | Orphans left behind by exited agents | ✓ one snapshot | ✓ remembered across sessions, plus unconfirmed suspects |
@@ -91,12 +96,12 @@ What the app adds on top of `agents-ps`:
 
 ## Plain-text output
 
-Piped, redirected or with `--json`, `agents-ps` prints a plain report instead of
-opening the interactive view. `agents-ps sessions` prints that report on a terminal too.
+Piped, redirected or with `--json`, `agtop` prints a plain report instead of
+opening the interactive view. `agtop sessions` prints that report on a terminal too.
 
 ```
-$ agents-ps sessions
-agents-ps  4 sessions · 34 processes · 14.5% CPU · 1.98 GiB · sampled in 341 ms
+$ agtop sessions
+agtop  4 sessions · 34 processes · 14.5% CPU · 1.98 GiB · sampled in 341 ms
 
 omp  pid 34908 · ttys001 · up 1d 22h · 16 processes · 0.2% CPU · 772.6 MiB
   PID    PROCESS                                CPU        RSS  PORTS
@@ -126,19 +131,19 @@ above 100% means more than one core.
 The useful command is usually the second one:
 
 ```
-$ agents-ps orphans
-agents-ps orphans  1 process left behind by agents that already exited
+$ agtop orphans
+agtop orphans  1 process left behind by agents that already exited
 
   PID    PROCESS                         AGE          RSS  PORTS  LIKELY FROM  EVIDENCE
   15687  bash sleep 300 & bash -c "sle…  21h 30m  5.6 MiB  -      Claude Code  env marker
 
-agents-ps never kills anything. To stop them yourself:
+agtop never kills anything. To stop them yourself:
   kill -TERM 15687
 ```
 
 ```
-$ agents-ps ports
-agents-ps ports  5 listening ports owned by agent processes
+$ agtop ports
+agtop ports  5 listening ports owned by agent processes
 
   PORT   PID    PROCESS                       OWNER
   9224   32415  omp browser-relay             omp (session pid 38070)
@@ -152,10 +157,10 @@ agents-ps ports  5 listening ports owned by agent processes
 
 | Command | What it prints |
 | --- | --- |
-| `agents-ps` | in a terminal: the interactive view (session trees, orphans and ports with folding, sorting, filtering and a details pane; read-only). Piped, redirected or with `--json`: the same report as `agents-ps sessions`. |
-| `agents-ps sessions` | one block per agent session: agent, pid, uptime, its process tree with pid, short command, CPU, RSS, listening ports, and per-session totals. Sorted by total RSS, largest first. |
-| `agents-ps orphans` | processes left behind by agents that already exited: pid, command, age, RSS, ports, the agent that likely spawned it, the evidence, and a copy-pasteable `kill -TERM` line. |
-| `agents-ps ports` | listening TCP ports owned by agent trees or orphans, one row per port. |
+| `agtop` | in a terminal: the interactive view (session trees, orphans and ports with folding, sorting, filtering and a details pane; read-only). Piped, redirected or with `--json`: the same report as `agtop sessions`. |
+| `agtop sessions` | one block per agent session: agent, pid, uptime, its process tree with pid, short command, CPU, RSS, listening ports, and per-session totals. Sorted by total RSS, largest first. |
+| `agtop orphans` | processes left behind by agents that already exited: pid, command, age, RSS, ports, the agent that likely spawned it, the evidence, and a copy-pasteable `kill -TERM` line. |
+| `agtop ports` | listening TCP ports owned by agent trees or orphans, one row per port. |
 
 Flags: `--json` for machine-readable output, `--no-hint` to drop the one line about
 Agents Monitor (in the interactive view it hides the footer hint), `--version`,
@@ -205,7 +210,7 @@ Nothing else is listed, which is why the output is short.
 
 ## Limitations
 
-- **One snapshot, no memory.** `agents-ps` keeps no state between runs. An orphan is
+- **One snapshot, no memory.** `agtop` keeps no state between runs. An orphan is
   recognised from the evidence in its own process entry, so a leftover that carries
   no agent environment marker and does not run from your home directory is not
   reported. The desktop app remembers sessions across ticks and does not have this
@@ -221,16 +226,16 @@ Nothing else is listed, which is why the output is short.
   for it.
 - **No background server.** Every invocation costs one sample interval (~0.4 s).
 
-`agents-ps` never kills anything: there is no kill flag, no signal code, no
+`agtop` never kills anything: there is no kill flag, no signal code, no
 confirmation prompt. Where a cleanup would help, it prints the commands and you run
 them.
 
 ## Want live monitoring?
 
-[Agents Monitor](https://agentmonitor.haziapp.com/?utm_source=agents-ps) is the
+[Agents Monitor](https://agentmonitor.haziapp.com/?utm_source=agtop) is the
 native macOS app built on the same detection: continuous sampling, threshold alerts
 and notifications, history across sessions, and one-click cleanup of what an agent
-left running. `agents-ps` stays complete on its own and never needs it.
+left running. `agtop` stays complete on its own and never needs it.
 
 ## License
 

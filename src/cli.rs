@@ -4,10 +4,10 @@
 use lexopt::prelude::*;
 
 pub const HELP: &str = "\
-agents-ps — see what AI coding agents are running on your Mac
+agtop — see what AI coding agents are running on your Mac
 
 USAGE:
-    agents-ps [COMMAND] [OPTIONS]
+    agtop [COMMAND] [OPTIONS]
 
 COMMANDS:
     (none)     interactive full-screen view in a terminal (sessions, orphans,
@@ -22,7 +22,7 @@ OPTIONS:
     -h, --help   show this help
     -V, --version   show the version
 
-Read-only: agents-ps never kills, signals or modifies anything.
+Read-only: agtop never kills, signals or modifies anything.
 Exit code 0 on success, 2 on a usage error.
 ";
 
@@ -106,43 +106,43 @@ mod tests {
         assert_eq!(args.command, Command::Auto);
         assert!(!args.json && !args.no_hint && !args.help);
         assert_eq!(
-            parse(["agents-ps", "sessions"]).unwrap().command,
+            parse(["agtop", "sessions"]).unwrap().command,
             Command::Sessions
         );
     }
 
     #[test]
     fn subcommands_and_flags() {
-        let args = parse(["agents-ps", "orphans", "--json"]).unwrap();
+        let args = parse(["agtop", "orphans", "--json"]).unwrap();
         assert_eq!(args.command, Command::Orphans);
         assert!(args.json);
 
-        let args = parse(["agents-ps", "--no-hint", "ports"]).unwrap();
+        let args = parse(["agtop", "--no-hint", "ports"]).unwrap();
         assert_eq!(args.command, Command::Ports);
         assert!(args.no_hint);
     }
 
     #[test]
     fn help_and_version() {
-        assert!(parse(["agents-ps", "--help"]).unwrap().help);
-        assert!(parse(["agents-ps", "-h"]).unwrap().help);
-        assert!(parse(["agents-ps", "--version"]).unwrap().version);
-        assert!(parse(["agents-ps", "-V"]).unwrap().version);
+        assert!(parse(["agtop", "--help"]).unwrap().help);
+        assert!(parse(["agtop", "-h"]).unwrap().help);
+        assert!(parse(["agtop", "--version"]).unwrap().version);
+        assert!(parse(["agtop", "-V"]).unwrap().version);
     }
 
     #[test]
     fn unknown_command_is_an_error() {
-        let err = parse(["agents-ps", "kill"]).unwrap_err();
+        let err = parse(["agtop", "kill"]).unwrap_err();
         assert!(err.0.contains("unknown command"));
     }
 
     #[test]
     fn second_positional_is_an_error() {
-        assert!(parse(["agents-ps", "ports", "orphans"]).is_err());
+        assert!(parse(["agtop", "ports", "orphans"]).is_err());
     }
 
     #[test]
     fn unknown_flag_is_an_error() {
-        assert!(parse(["agents-ps", "--kill"]).is_err());
+        assert!(parse(["agtop", "--kill"]).is_err());
     }
 }

@@ -587,7 +587,7 @@ impl App {
         match copy_to_clipboard(&text) {
             Ok(()) => {
                 self.toast = Some((
-                    "Copied — agents-ps never runs it".to_string(),
+                    "Copied — agtop never runs it".to_string(),
                     false,
                     Instant::now(),
                 ));

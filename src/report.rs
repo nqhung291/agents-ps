@@ -11,7 +11,7 @@ use crate::tree::LiveTree;
 
 /// The one and only promotional line; printed only on a TTY, never with `--json`.
 pub const HINT: &str = "Live monitoring, alerts and one-click cleanup: Agents Monitor → \
-https://agentmonitor.haziapp.com/?utm_source=agents-ps";
+https://agentmonitor.haziapp.com/?utm_source=agtop";
 
 /// Machine-readable schema version. Bumped only on incompatible changes.
 pub const SCHEMA: u32 = 1;
@@ -171,7 +171,7 @@ pub fn sessions_text(
     );
     out.push_str(&format!(
         "{}  {}\n",
-        style.bold("agents-ps"),
+        style.bold("agtop"),
         style.dim(&summary)
     ));
 
@@ -283,7 +283,7 @@ pub fn orphans_text(orphans: &[OrphanView], style: Style) -> String {
     if orphans.is_empty() {
         out.push_str(&format!(
             "{}  {}\n",
-            style.bold("agents-ps orphans"),
+            style.bold("agtop orphans"),
             style.dim("no leftover agent processes found")
         ));
         return out;
@@ -291,7 +291,7 @@ pub fn orphans_text(orphans: &[OrphanView], style: Style) -> String {
 
     out.push_str(&format!(
         "{}  {}\n\n",
-        style.bold("agents-ps orphans"),
+        style.bold("agtop orphans"),
         style.dim(&format!(
             "{} left behind by agents that already exited",
             plural(orphans.len(), "process", "processes")
@@ -381,7 +381,7 @@ pub fn orphans_text(orphans: &[OrphanView], style: Style) -> String {
     let pids: Vec<String> = orphans.iter().map(|o| o.pid.to_string()).collect();
     out.push_str(&format!(
         "\n{}\n  {}\n",
-        style.dim("agents-ps never kills anything. To stop them yourself:"),
+        style.dim("agtop never kills anything. To stop them yourself:"),
         style.yellow(&format!("kill -TERM {}", pids.join(" "))),
     ));
     out
@@ -393,14 +393,14 @@ pub fn ports_text(rows: &[PortRow], style: Style) -> String {
     if rows.is_empty() {
         out.push_str(&format!(
             "{}  {}\n",
-            style.bold("agents-ps ports"),
+            style.bold("agtop ports"),
             style.dim("no listening ports in agent trees or orphans")
         ));
         return out;
     }
     out.push_str(&format!(
         "{}  {}\n\n",
-        style.bold("agents-ps ports"),
+        style.bold("agtop ports"),
         style.dim(&format!(
             "{} owned by agent processes",
             plural(rows.len(), "listening port", "listening ports")
@@ -481,7 +481,7 @@ struct JsonSessions<'a> {
 
 #[derive(Serialize)]
 struct JsonCleanup {
-    /// Pids a manual `kill -TERM` line would target; agents-ps never signals them.
+    /// Pids a manual `kill -TERM` line would target; agtop never signals them.
     terminate: Vec<i32>,
 }
 

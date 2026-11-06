@@ -1,11 +1,11 @@
 [package]
-name = "agents-ps"
-version = "0.2.0"
+name = "agtop"
+version = "0.3.0"
 edition = "2024"
 rust-version = "1.88"
 description = "See what Claude Code, Codex, Cursor and other AI agents are running on your Mac"
 license = "MIT"
-repository = "https://github.com/nqhung291/agents-ps"
+repository = "https://github.com/nqhung291/agtop"
 homepage = "https://agentmonitor.haziapp.com"
 readme = "README.md"
 keywords = ["ai", "agents", "process", "macos", "cli"]

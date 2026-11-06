@@ -203,7 +203,7 @@ fn draw_header(frame: &mut Frame, app: &App, area: Rect) {
     } else {
         palette.bold()
     };
-    left.push(Span::styled(" agents-ps ", badge_style));
+    left.push(Span::styled(" agtop ", badge_style));
 
     match app.snap.as_ref() {
         Some(snapshot) => {
@@ -943,7 +943,7 @@ fn draw_copy_box(frame: &mut Frame, detail: &DetailView, area: Rect, palette: Pa
         .title(Line::from(Span::styled(" y copy ", palette.bold())));
     let lines = vec![
         Line::from(format!(" kill -TERM {}", detail.pid)),
-        Line::from(Span::styled(" agents-ps never runs it", palette.dim())),
+        Line::from(Span::styled(" agtop never runs it", palette.dim())),
     ];
     frame.render_widget(Paragraph::new(lines).block(block), area);
 }
@@ -1051,7 +1051,7 @@ fn draw_help(frame: &mut Frame, app: &App, area: Rect) {
     }
     lines.push(Line::from(""));
     lines.push(Line::from(Span::styled(
-        " read-only: agents-ps never sends signals",
+        " read-only: agtop never sends signals",
         palette.bold(),
     )));
     lines.push(Line::from(Span::styled(

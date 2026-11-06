@@ -1,4 +1,4 @@
-//! agents-ps: see what AI coding agents are running on your Mac. Read-only.
+//! agtop: see what AI coding agents are running on your Mac. Read-only.
 
 mod cli;
 mod darwin;
@@ -26,7 +26,7 @@ fn run() -> i32 {
     let args = match cli::parse(std::env::args_os()) {
         Ok(args) => args,
         Err(err) => {
-            eprintln!("agents-ps: {err}");
+            eprintln!("agtop: {err}");
             eprintln!("\n{}", cli::HELP.trim_end());
             return 2;
         }
@@ -36,11 +36,11 @@ fn run() -> i32 {
         return 0;
     }
     if args.version {
-        emit(&format!("agents-ps {}\n", env!("CARGO_PKG_VERSION")));
+        emit(&format!("agtop {}\n", env!("CARGO_PKG_VERSION")));
         return 0;
     }
 
-    // Bare `agents-ps` on a terminal is the interactive view; piped, redirected
+    // Bare `agtop` on a terminal is the interactive view; piped, redirected
     // or `--json`, it stays the plain sessions report so scripts keep working.
     if args.command == Command::Auto && !args.json && interactive_terminal() {
         return run_tui(&args);
@@ -52,7 +52,7 @@ fn run() -> i32 {
             0
         }
         Err(err) => {
-            eprintln!("agents-ps: {err}");
+            eprintln!("agtop: {err}");
             1
         }
     }
@@ -72,7 +72,7 @@ fn run_tui(args: &Args) -> i32 {
     match tui::run(opts) {
         Ok(()) => 0,
         Err(err) => {
-            eprintln!("agents-ps: {err}");
+            eprintln!("agtop: {err}");
             1
         }
     }
